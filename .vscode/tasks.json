@@ -1,0 +1,54 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "compile python via pyinstaller",
+            "type": "shell",
+            "linux": {
+                "command": "python ${workspaceFolder}/.vscode/compilers/pycompile.py ${fileDirname} ${fileBasename} ${workspaceFolder}"
+            },
+            "windows": {
+                "command": "python ${workspaceFolder}\\.vscode\\compilers\\pycompile.py ${fileDirname} ${fileBasename} ${workspaceFolder}"
+            },
+            "group": "build",
+            "presentation": {
+                "reveal": "silent",
+                "focus": false,
+                "clear": true
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "run python file",
+            "type": "shell",
+            "linux": {
+                "command": "python ${file}"
+            },
+            "windows": {
+                "command": "python ${file}"
+            },
+            "group": "test",
+            "presentation": {
+                "reveal": "always",
+                "focus": false,
+                "clear": true
+            }
+        },
+        {
+            "label": "test script",
+            "type": "shell",
+            "linux": {
+                "command": "python ${workspaceFolder}/.vscode/testers/testSite.py ${file} ${file}.test ${fileExtname} ${fileDirname} ${workspaceFolder} ${fileBasename}"
+            },
+            "windows": {
+                "command": "python ${workspaceFolder}/.vscode/testers/testSite.py ${file} ${file}.test ${fileExtname} ${fileDirname} ${workspaceFolder} ${fileBasename}"
+            },
+            "group": "test",
+            "presentation": {
+                "reveal": "always",
+                "focus": false,
+                "clear": true
+            }
+        }
+    ]
+}
