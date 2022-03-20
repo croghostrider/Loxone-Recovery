@@ -38,8 +38,6 @@ def clean():
     shutil.rmtree(path)
     path = os.path.join(fileDirname, "build")
     shutil.rmtree(path)
-    path = os.path.join(fileDirname, "%s.spec" % fileBasenameNoExtension)
-    os.remove(path)
 
 if __name__ == "__main__":
     COMMAND = construct()
