@@ -1,9 +1,13 @@
 name: Create Release
 
+# yamllint disable-line rule:truthy
 on:
   push:
     tags:
-    - '*'
+      - '*'
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
 
 jobs:
   build:
@@ -13,22 +17,29 @@ jobs:
       contents: write
 
     steps:
-    - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
+        with:
+          # by default, it uses a depth of 1
+          # this fetches all history so that we can read each commit
+          fetch-depth: 0
 
-    - name: Package Application
-      uses: JackMcKew/pyinstaller-action-windows@main
-      with:
-        path: src
+      - name: Generate Changelog
+        run: .github/release_message.sh > CHANGELOG.md
 
-    - uses: ncipollo/release-action@v1
-      with:
-        allowUpdates: true
-        artifactErrorsFailBuild: false
-        artifacts: "src/dist/windows/app.exe"
-        artifactContentType: "raw"
-        bodyFile: "CHANGELOG.md"
-        draft: false
-        generateReleaseNotes: true
-        prerelease: false
-        replacesArtifacts: true
-        token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Package Application
+        uses: JackMcKew/pyinstaller-action-windows@main
+        with:
+          path: src
+
+      - uses: ncipollo/release-action@v1
+        with:
+          allowUpdates: true
+          artifactErrorsFailBuild: false
+          artifacts: "src/dist/windows/app.exe"
+          artifactContentType: "raw"
+          bodyFile: "CHANGELOG.md"
+          draft: false
+          generateReleaseNotes: true
+          prerelease: false
+          replacesArtifacts: true
+          token: ${{ secrets.GITHUB_TOKEN }}
