@@ -1,0 +1,274 @@
+name: CI
+
+# yamllint disable-line rule:truthy
+on:
+  push:
+    branches:
+      - main
+  pull_request: ~
+  workflow_dispatch:
+
+env:
+  DEFAULT_PYTHON: 3.9
+  PRE_COMMIT_CACHE: ~/.cache/pre-commit
+  PIP_CACHE: /tmp/pip-cache
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint-black:
+    name: Check black
+    runs-on: ubuntu-latest
+    needs:
+      - changes
+      - prepare-base
+    steps:
+      - name: Check out code from GitHub
+        uses: actions/checkout@v3.0.0
+      - name: Set up Python ${{ env.DEFAULT_PYTHON }}
+        uses: actions/setup-python@v3.0.0
+        id: python
+        with:
+          python-version: ${{ env.DEFAULT_PYTHON }}
+      - name: Restore base Python virtual environment
+        id: cache-venv
+        uses: actions/cache@v2.1.7
+        with:
+          path: venv
+          key: ${{ runner.os }}-${{ steps.python.outputs.python-version }}-${{
+            needs.prepare-base.outputs.python-key }}
+      - name: Fail job if Python cache restore failed
+        if: steps.cache-venv.outputs.cache-hit != 'true'
+        run: |
+          echo "Failed to restore Python virtual environment from cache"
+          exit 1
+      - name: Restore pre-commit environment from cache
+        id: cache-precommit
+        uses: actions/cache@v2.1.7
+        with:
+          path: ${{ env.PRE_COMMIT_CACHE }}
+          key: ${{ runner.os }}-${{ needs.prepare-base.outputs.pre-commit-key }}
+      - name: Fail job if pre-commit cache restore failed
+        if: steps.cache-precommit.outputs.cache-hit != 'true'
+        run: |
+          echo "Failed to restore pre-commit environment from cache"
+          exit 1
+      - name: Run black (fully)
+        run: |
+          . venv/bin/activate
+          pre-commit run --hook-stage manual black --all-files --show-diff-on-failure
+  lint-flake8:
+    name: Check flake8
+    runs-on: ubuntu-latest
+    needs:
+      - changes
+      - prepare-base
+    steps:
+      - name: Check out code from GitHub
+        uses: actions/checkout@v3.0.0
+      - name: Set up Python ${{ env.DEFAULT_PYTHON }}
+        uses: actions/setup-python@v3.0.0
+        id: python
+        with:
+          python-version: ${{ env.DEFAULT_PYTHON }}
+      - name: Restore base Python virtual environment
+        id: cache-venv
+        uses: actions/cache@v2.1.7
+        with:
+          path: venv
+          key: ${{ runner.os }}-${{ steps.python.outputs.python-version }}-${{
+            needs.prepare-base.outputs.python-key }}
+      - name: Fail job if Python cache restore failed
+        if: steps.cache-venv.outputs.cache-hit != 'true'
+        run: |
+          echo "Failed to restore Python virtual environment from cache"
+          exit 1
+      - name: Restore pre-commit environment from cache
+        id: cache-precommit
+        uses: actions/cache@v2.1.7
+        with:
+          path: ${{ env.PRE_COMMIT_CACHE }}
+          key: ${{ runner.os }}-${{ needs.prepare-base.outputs.pre-commit-key }}
+      - name: Fail job if pre-commit cache restore failed
+        if: steps.cache-precommit.outputs.cache-hit != 'true'
+        run: |
+          echo "Failed to restore pre-commit environment from cache"
+          exit 1
+      - name: Register flake8 problem matcher
+        run: |
+          echo "::add-matcher::.github/workflows/matchers/flake8.json"
+      - name: Run flake8 (fully)
+        run: |
+          . venv/bin/activate
+          pre-commit run --hook-stage manual flake8 --all-files
+  lint-isort:
+    name: Check isort
+    runs-on: ubuntu-latest
+    needs: prepare-base
+    steps:
+      - name: Check out code from GitHub
+        uses: actions/checkout@v3.0.0
+      - name: Set up Python ${{ env.DEFAULT_PYTHON }}
+        uses: actions/setup-python@v3.0.0
+        id: python
+        with:
+          python-version: ${{ env.DEFAULT_PYTHON }}
+      - name: Restore base Python virtual environment
+        id: cache-venv
+        uses: actions/cache@v2.1.7
+        with:
+          path: venv
+          key: ${{ runner.os }}-${{ steps.python.outputs.python-version }}-${{
+            needs.prepare-base.outputs.python-key }}
+      - name: Fail job if Python cache restore failed
+        if: steps.cache-venv.outputs.cache-hit != 'true'
+        run: |
+          echo "Failed to restore Python virtual environment from cache"
+          exit 1
+      - name: Restore pre-commit environment from cache
+        id: cache-precommit
+        uses: actions/cache@v2.1.7
+        with:
+          path: ${{ env.PRE_COMMIT_CACHE }}
+          key: ${{ runner.os }}-${{ needs.prepare-base.outputs.pre-commit-key }}
+      - name: Fail job if pre-commit cache restore failed
+        if: steps.cache-precommit.outputs.cache-hit != 'true'
+        run: |
+          echo "Failed to restore pre-commit environment from cache"
+          exit 1
+      - name: Run isort
+        run: |
+          . venv/bin/activate
+          pre-commit run --hook-stage manual isort --all-files --show-diff-on-failure
+  lint-other:
+    name: Check other linters
+    runs-on: ubuntu-latest
+    needs:
+      - changes
+      - prepare-base
+    steps:
+      - name: Check out code from GitHub
+        uses: actions/checkout@v3.0.0
+      - name: Set up Python ${{ env.DEFAULT_PYTHON }}
+        uses: actions/setup-python@v3.0.0
+        id: python
+        with:
+          python-version: ${{ env.DEFAULT_PYTHON }}
+      - name: Restore base Python virtual environment
+        id: cache-venv
+        uses: actions/cache@v2.1.7
+        with:
+          path: venv
+          key: ${{ runner.os }}-${{ steps.python.outputs.python-version }}-${{
+            needs.prepare-base.outputs.python-key }}
+      - name: Fail job if Python cache restore failed
+        if: steps.cache-venv.outputs.cache-hit != 'true'
+        run: |
+          echo "Failed to restore Python virtual environment from cache"
+          exit 1
+      - name: Restore pre-commit environment from cache
+        id: cache-precommit
+        uses: actions/cache@v2.1.7
+        with:
+          path: ${{ env.PRE_COMMIT_CACHE }}
+          key: ${{ runner.os }}-${{ needs.prepare-base.outputs.pre-commit-key }}
+      - name: Fail job if pre-commit cache restore failed
+        if: steps.cache-precommit.outputs.cache-hit != 'true'
+        run: |
+          echo "Failed to restore pre-commit environment from cache"
+          exit 1
+      - name: Run pyupgrade (fully)
+        run: |
+          . venv/bin/activate
+          pre-commit run --hook-stage manual pyupgrade --all-files --show-diff-on-failure
+      - name: Register yamllint problem matcher
+        run: |
+          echo "::add-matcher::.github/workflows/matchers/yamllint.json"
+      - name: Run yamllint
+        run: |
+          . venv/bin/activate
+          pre-commit run --hook-stage manual yamllint --all-files --show-diff-on-failure
+      - name: Register check-json problem matcher
+        run: |
+          echo "::add-matcher::.github/workflows/matchers/check-json.json"
+      - name: Run check-json
+        run: |
+          . venv/bin/activate
+          pre-commit run --hook-stage manual check-json --all-files
+      - name: Register check executables problem matcher
+        run: |
+          echo "::add-matcher::.github/workflows/matchers/check-executables-have-shebangs.json"
+      - name: Run executables check
+        run: |
+          . venv/bin/activate
+          pre-commit run --hook-stage manual check-executables-have-shebangs --all-files
+      - name: Register codespell problem matcher
+        run: |
+          echo "::add-matcher::.github/workflows/matchers/codespell.json"
+      - name: Run codespell
+        run: |
+          . venv/bin/activate
+          pre-commit run --show-diff-on-failure --hook-stage manual codespell --all-files
+      - name: Register hadolint problem matcher
+        run: |
+          echo "::add-matcher::.github/workflows/matchers/hadolint.json"
+      - name: Check Dockerfile
+        uses: docker://hadolint/hadolint:v1.18.2
+        with:
+          args: hadolint Dockerfile
+      - name: Check Dockerfile.dev
+        uses: docker://hadolint/hadolint:v1.18.2
+        with:
+          args: hadolint Dockerfile.dev
+
+      - name: Run bandit (fully)
+        run: |
+          . venv/bin/activate
+          pre-commit run --hook-stage manual bandit --all-files --show-diff-on-failure
+  gen-requirements-all:
+    name: Check all requirements
+    runs-on: ubuntu-latest
+    needs: prepare-base
+    steps:
+      - name: Check out code from GitHub
+        uses: actions/checkout@v3.0.0
+      - name: Set up Python ${{ env.DEFAULT_PYTHON }}
+        uses: actions/setup-python@v3.0.0
+        id: python
+        with:
+          python-version: ${{ env.DEFAULT_PYTHON }}
+      - name: Restore base Python virtual environment
+        id: cache-venv
+        uses: actions/cache@v2.1.7
+        with:
+          path: venv
+          key: ${{ runner.os }}-${{ steps.python.outputs.python-version }}-${{
+            needs.prepare-base.outputs.python-key }}
+      - name: Fail job if Python cache restore failed
+        if: steps.cache-venv.outputs.cache-hit != 'true'
+        run: |
+          echo "Failed to restore Python virtual environment from cache"
+          exit 1
+      - name: Run gen_requirements_all.py
+        run: |
+          . venv/bin/activate
+          python -m script.gen_requirements_all validate
+
+  pytest:
+    runs-on: ubuntu-latest
+    if: |
+      (github.event_name != 'push' || github.event.repository.full_name == 'croghostrider/Loxone-Recovery')
+      && github.event.inputs.lint-only != 'true'
+      && (needs.changes.outputs.tests_glob)
+    needs:
+      - gen-requirements-all
+      - lint-black
+      - lint-other
+      - lint-isort
+    strategy:
+      fail-fast: false
+      matrix:
+        group: ${{ fromJson(needs.changes.outputs.test_groups) }}
+        python-version: ["3.9", "3.10"]
