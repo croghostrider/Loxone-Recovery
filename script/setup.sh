@@ -22,6 +22,3 @@ if [ ! -n "$DEVCONTAINER" ];then
 fi
 
 python3 -m pip install tox tox-pip-version colorlog pre-commit
-
-pre-commit install
-python3 -m pip install -e . --constraint requirements.txt --use-deprecated=legacy-resolver
