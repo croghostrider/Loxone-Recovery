@@ -1,0 +1,5 @@
+{
+    "python.formatting.provider": "black",
+    "python.testing.pytestArgs": ["--no-cov"],
+    "python.testing.pytestEnabled": false
+  }
