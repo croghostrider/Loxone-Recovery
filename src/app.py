@@ -48,12 +48,10 @@ def list_files():
     # files = [f for f in os.listdir(source_entry.get()) if os.path.isfile(f)]
     start_button.state(["disabled"])
     start_button.update()
-    filelist = [
-        filename
-        for filename in os.listdir(source_entry.get())
-        if filename.startswith("sps_") and (filename.endswith(".zip"))
-    ]
-
+    filelist = []
+    for filename in os.listdir(source_entry.get()):
+        if filename.startswith("sps_") and (filename.endswith(".zip")):
+            filelist.append(filename)
     for filename in filelist:
         lox_backup(filename, source_entry.get(), destination_entry.get())
 
