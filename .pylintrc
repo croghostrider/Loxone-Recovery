@@ -1,0 +1,4 @@
+[MESSAGES CONTROL]
+# - bad-continuation is broken and conflicts with black formatting (is this
+#   still true? either way it shouldn't be necessary with black)
+disable=bad-continuation
