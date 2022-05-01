@@ -14,7 +14,7 @@ import zlib
 
 def lox_backup(filename, source, destination):
     """Generate a manifest from a legacy module."""
-    zf = zipfile.ZipFile(f"{source}/{filename}")
+    zf = zipfile.ZipFile(source + "/" + filename)
     with zf.open("sps0.LoxCC") as f:
         (header,) = struct.unpack("<L", f.read(4))
         if header == 0xAABBCCEE:  # magic word to detect a compressed file
@@ -66,7 +66,7 @@ def lox_backup(filename, source, destination):
                 # Duplicating the last byte in the buffer multiple times is possible,
                 # so we need to account for that.
                 while bytesBackCopied > 0:
-                    if -bytesBack == -1:
+                    if -bytesBack + 1 == 0:
                         resultStr += resultStr[-bytesBack:]
                     else:
                         resultStr += resultStr[-bytesBack : -bytesBack + 1]
@@ -90,5 +90,5 @@ def lox_backup(filename, source, destination):
                 + filename[17:][:6]
             )
             print(newfilename)
-            with open(f"{destination}/{newfilename}.Loxone", "wb") as f:
+            with open(destination + "/" + newfilename + ".Loxone", "wb") as f:
                 f.write(resultStr)
