@@ -21,7 +21,6 @@ def lox_backup(filename, source, destination):
             create_backup_file(f, filename, destination)
 
 
-# TODO Rename this here and in `lox_backup`
 def create_backup_file(f, filename, destination):
     (
         compressedSize,
