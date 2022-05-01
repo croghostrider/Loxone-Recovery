@@ -17,13 +17,14 @@ distpath = os.path.join(workspaceFolder, "output", relativeFileDirname)
 
 # COMMAND GENERATOR
 def construct():
-    COMMAND = []
-    COMMAND.append("pyinstaller")
-    COMMAND.append("--onefile")
-    COMMAND.append("--clean")
-    COMMAND.append("--noconsole")
-    COMMAND.append("--distpath")
-    COMMAND.append(distpath)
+    COMMAND = [
+        "pyinstaller",
+        "--onefile",
+        "--clean",
+        "--noconsole",
+        "--distpath",
+        distpath,
+    ]
     for file in os.listdir(fileDirname):
         if file.endswith(".ico"):
             COMMAND.append("--icon")
